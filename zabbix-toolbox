@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+#====================================================
+#        NAME : zabbix-toolbox.pl
+#        DATE : 02/02/2018
+#      AUTHOR : William FEO
+# DESCRIPTION : 
+#     VERSION : 1.0
+#====================================================
+
+#_____PACKAGES_____
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use Moo;
+use 5.010;
+use Getopt::Long qw(GetOptions);
+use feature 'say';
+use IPC::System::Simple qw(system);
+use Cwd;
+
+#_____VARIABLES_____
+my $DIR = getcwd;
+my $DIR_BIN = "$DIR/bin";
+
+my $BIN_INIT="$DIR_BIN/init.pl";
+my $BIN_HOST_CREATE="$DIR_BIN/host_create.pl";
+my $BIN_HOSTINVENTORY_UPDATE="$DIR_BIN/hostinventory_update.pl";
+
+my ($init,$fileCreateHosts,$fileUpdateHostInventory,$fileForceUpdateHostInventory,$help) ;
+
+#_____FUNCTIONS_____
+sub fctHelp {
+	say "
+NOM
+	zabbix-toolbox - API pour l'outil de supervision Zabbix version 3.4
+
+SYNOPSIS
+	zabbix-toolbox [OPTIONS] [FICHIER]
+
+DESCRIPTION
+	zabbix-toolbox est un API permettant de réaliser des tâches d'administration avec l'outil de supervision Zabbix.
+
+OPTIONS
+	Initialisation
+		-i, --init
+			Initialisation de l'API avec l'adresse du serveur, le nom d'utilisateur et le mot de passe.
+			
+	Création
+		-cht, --create-host [fichier.csv]
+			Procède à la création massive d'hôtes à partir d'un fichier CSV fourni en paramètre.
+		
+	Mise à jour
+		-uhi, --update-host-inventory [fichier.csv]
+			Procède à la mise à jour massive des champs d'inventaires non renseignés de l'hôte à partir du fichier CSV passé en paramètre
+			
+		-fuhi, --force-update-host-inventory [fichier.csv]
+			Procède à la mise à jour massive et forcée des champs d'inventaires de l'hôte à partir du fichier CSV passé en paramètre
+			
+		-h, --help
+			Affiche l'aide
+";
+}
+
+#_____PROGRAMME_____
+
+GetOptions(
+	'init|i'                             => \$init,
+	'create-host|cht=s'                  => \$fileCreateHosts,
+	'update-host-inventory|uhi=s'        => \$fileUpdateHostInventory,
+	'force-update-host-inventory|fuhi=s' => \$fileForceUpdateHostInventory,
+	'help|h'                             => \$help
+);
+
+
+if ( defined $init ) {
+	my @args = ("$BIN_INIT");
+	system($^X, @args);    
+} 
+
+if ( defined $fileCreateHosts ) {
+	my @args = ("$BIN_HOST_CREATE","$fileCreateHosts");
+	system($^X, @args);    
+} 
+
+if ( defined $fileUpdateHostInventory ) {
+	my @args = ("$BIN_HOSTINVENTORY_UPDATE","0","$fileUpdateHostInventory");
+	system($^X, @args);
+}
+
+if ( defined $fileForceUpdateHostInventory ) {
+	my @args = ("$BIN_HOSTINVENTORY_UPDATE","1","$fileForceUpdateHostInventory");
+	system($^X, @args);
+}
+
+if ( defined $help ) {
+	fctHelp;
+}
+
+# if ( not defined $ARGV[0] ) {
+	# fctHelp;
+# }
+
+# if ( $ARGV[0] ne 'init' || $ARGV[0] ne $fileCreateHosts || $ARGV[0] ne $fileUpdateHostInventory || $ARGV[0] ne $fileForceUpdateHostInventory || $ARGV[0] ne $help ) {
+	# say "Invalid argument : $ARGV[0]";
+	# fctHelp;
+# }
