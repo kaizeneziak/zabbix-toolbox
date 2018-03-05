@@ -19,10 +19,10 @@ use Zabbix::Host;
 use Zabbix::HostGroup;
 use Zabbix::Log;
 use Text::CSV;
+use Text::Iconv;
 
 #_____VARIABLES_____
-#my $file = "/opt/Zabbix-Toolbox/csv/csvHostCreate.csv";
-my $file = $ARGV[0];
+my $fileInput = $ARGV[0];
 
 my $IPorDNS;
 
@@ -48,27 +48,32 @@ if ( $zabbixAuth->login() ) {
 
 	# Lecture du Fichier CSV ligne par ligne
 	# Chargement du fichier
-	$zabbixLog->log_INFO("Chargement du fichier $file");
+	$zabbixLog->log_INFO("Chargement du fichier $fileInput");
 
 	my $csv = Text::CSV->new({
-		binary   => 1,
-		eol      => "\N{LF}",
-		sep_char => ';',
+		binary   	=> 1,
+		auto_diag 	=> 1,
+		sep_char 	=> ';',
 	});
 
-	open (my $data ,'<:encoding(UTF-8)',$file) or die "Impossible d'ouvrir le fichier '$file' !\n";
+	# Conversion du fichier
+	my $encodage = Text::Iconv->new("cp1252","utf-8");
+	my $file = $encodage->convert($fileInput);
+	
+	open (my $data ,'<',$file) or die "Impossible d'ouvrir le fichier '$file' !\n";
+	
+	# Ignore header
+	$csv->getline($data);
 	
 	# Parcours du fichier
-	while (my $line = <$data>) {
-		chomp $line;
-		if ($csv->parse($line)) {
-			my @fields 		= $csv->fields();
-			my $csvHost 		= $fields[0];
-			my $csvInterface 	= $fields[1];
-			my $csvUseIP 		= $fields[2];
-			my $csvIPorDNS 		= $fields[3];
-			my $csvDescription 	= $fields[4];
-			my $csvHostGroups 	= $fields[5];
+	while ( my $hostCreateFields = $csv->getline($data) ) {
+		my $csvHost 		= $hostCreateFields->[0];
+		if ( defined $hostCreateFields->[0] ) {
+			my $csvInterface 	= $hostCreateFields->[1];
+			my $csvUseIP 		= $hostCreateFields->[2];
+			my $csvIPorDNS 		= $hostCreateFields->[3];
+			my $csvDescription 	= $hostCreateFields->[4];
+			my $csvHostGroups 	= $hostCreateFields->[5];
 			
 			# Vérifications
 			# Vérif si host existe
@@ -118,9 +123,6 @@ if ( $zabbixAuth->login() ) {
 				say "[ Erreur ] : L'hote $csvHost existe";
 				$zabbixLog->log_ERROR("L'hote $csvHost existe !");
 			}
-		} else {
-			say "Impossible de parser le fichier CSV";
-            $zabbixLog->log_ERROR("Impossible de parser le fichier CSV !");
 		}
 	}
 	
