@@ -98,9 +98,9 @@ if ( $zabbixAuth->login() ) {
 					my $zabbixHostCreated = $zabbixHost->hostCreate(1,$csvHost,$interface,$port,$csvUseIP,$ipfield,$dnsfield,$csvDescription,@hostGroupIds);
 
 					if ($zabbixHostCreated eq 1) {
-						say "[ ok ] : L'hote $csvHost a été ajouté correctement.";
+						say "[ ok ] : L'hote $csvHost a ete ajoute correctement.";
 						$zabbixLog->log_INFO("================================================================================");
-						$zabbixLog->log_INFO("# Création l'hôte \"$csvHost\" réussie !");
+						$zabbixLog->log_INFO("# Création l'hote \"$csvHost\" reussie !");
 						$zabbixLog->log_INFO("================================================================================");
 						$zabbixLog->log_INFO("|               Host : $csvHost");
 						$zabbixLog->log_INFO("|          Interface : $csvInterface");
@@ -111,12 +111,12 @@ if ( $zabbixAuth->login() ) {
 						$zabbixLog->log_INFO("| Membre des groupes : $csvHostGroups");
 						$zabbixLog->log_INFO("|        Description : $csvDescription");
 					} else {
-						say "[ Erreur ] : Une erreur est survenue lors de la création de l'hôte";
-						$zabbixLog->log_ERROR("Une erreur est survenue lors de la création de l'hôte !");
+						say "[ Erreur ] : Une erreur est survenue lors de la création de l'hote";
+						$zabbixLog->log_ERROR("Une erreur est survenue lors de la création de l'hote !");
 					}
 			} else {
-				say "[ Erreur ] : L'hôte $csvHost existe";
-				$zabbixLog->log_ERROR("L'hôte $csvHost existe !");
+				say "[ Erreur ] : L'hote $csvHost existe";
+				$zabbixLog->log_ERROR("L'hote $csvHost existe !");
 			}
 		} else {
 			say "Impossible de parser le fichier CSV";
