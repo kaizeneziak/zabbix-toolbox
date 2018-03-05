@@ -19,6 +19,7 @@ use LWP;
 use Data::Dumper;
 use Config::IniFiles;
 use Text::CSV;
+use Cwd;
 
 use v5.10;
 #
@@ -28,8 +29,9 @@ use v5.10;
 # Version de la Classe
 our $VERSION = '0.1';
 
-#my $REGEX_IP = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
-my $fileCredentials = '/opt/Zabbix-Toolbox/conf/credentials.ini';
+my $DIR = getcwd;
+my $DIR_CONF="$DIR/conf";
+my $fileCredentials = "$DIR_CONF/credentials.ini";
 
 #
 # Définitions des attributs
