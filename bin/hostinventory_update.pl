@@ -8,6 +8,13 @@
 #====================================================
 
 #_____PACKAGES_____
+use utf8;
+
+# Encodage
+binmode STDIN, ":encoding(utf8)";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
@@ -47,7 +54,7 @@ if ( $zabbixAuth->login() ) {
 		binary   	=> 1,
 		auto_diag 	=> 1,
 		sep_char 	=> ';',
-		eol			=> "\r\n",
+		#eol			=> "\r\n",
 	});
 
 	open (my $data ,'<:encoding(utf-8)',$file) or die "Impossible d'ouvrir le fichier '$file' !\n";
@@ -57,10 +64,8 @@ if ( $zabbixAuth->login() ) {
 	
 	# Parcours du fichier
 	while ( my $hostInventoryFields = $csv->getline($data) ) {
-		my $i = 0;
 		my $csv_host = $hostInventoryFields->[0];;
 		if ( defined $hostInventoryFields->[0] ) {			
-	
 			# Vérifications
 			my ($hostExist,$hostid) = $zabbixHost->checkIfHostExist($csv_host);
 			if ( $hostExist eq 1 ) {
@@ -74,15 +79,15 @@ if ( $zabbixAuth->login() ) {
 				}
 				
 				if ( $statusHostUpdateInventory == 1 ) {
-					say "[ ok ] : Mise à jour des données d'inventaire de l'hôte \"$csv_host\" réussi";
-					$zabbixLog->log_ERROR("Mise à jour des données d'inventaire de l'hôte \"$csv_host\" réussi");
+					say "[ ok ] : Mise a jour des donnees d'inventaire de l'hote \"$csv_host\" reussi";
+					$zabbixLog->log_ERROR("Mise a jour des donnees d'inventaire de l'hote \"$csv_host\" reussi");
 				} else {
-					say "[ Erreur ] : Une erreur est survenue lors de la mise à jour des données d'inventaire de l'hôte \"$csv_host\" ! ";
-					$zabbixLog->log_ERROR("Une erreur est survenue lors de la mise à jour des données d'inventaire de l'hôte \"$csv_host\" !");
+					say "[ Erreur ] : Une erreur est survenue lors de la mise a jour des donnees d'inventaire de l'hote \"$csv_host\" ! ";
+					$zabbixLog->log_ERROR("Une erreur est survenue lors de la mise a jour des donnees d'inventaire de l'hote \"$csv_host\" !");
 				}
 			} else {
-				say "[ Erreur ] : L'hôte $csv_host n'existe pas !";
-				$zabbixLog->log_ERROR("L'hôte $csv_host n'existe pas !");
+				say "[ Erreur ] : L'hote $csv_host n'existe pas !";
+				$zabbixLog->log_ERROR("L'hote $csv_host n'existe pas !");
 			}
 		}
 	}
