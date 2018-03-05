@@ -9,15 +9,21 @@
 package Zabbix::Log;
 use Moo;
 use POSIX qw(strftime);
+use Cwd;
+use feature 'say';
 
 #_____VARIABLES_____
-my $logFileName = "/opt/AIT-Zabbix-Toolbox/log/zabbix_toolbox.log";
+my $DIR = getcwd;
+my $DIR_LOG="$DIR/log";
+
+my $logFileName = "$DIR_LOG/zabbix_toolbox.log";
 my $logFileMode = '>>';
-my $fileLog;
+my ($fileLog,$filetmp);
 my $date = strftime "%Y-%m-%d %H:%M:%S", localtime;
 
 #_____ATTRIBUTES_____
 #has 'log' => ( is => 'ro', default => sub { File::Log->new(logFileName => $logFileName,logFileMode => $logFileMode) } );
+
 
 # Constructeur
 sub new {
@@ -27,6 +33,10 @@ sub new {
 sub init {
         my $self = shift;
         # Création du fichier
+		if (! -f $logFileName) {
+			open($filetmp, '>:encoding(UTF-8)', $logFileName) or die "Impossible de créer le fichier $logFileName";
+			close($filetmp);
+		}
         open($fileLog, '>>:encoding(UTF-8)', $logFileName) or die "Impossible d'ouvrir le fichier $logFileName";
 }
 
