@@ -26,10 +26,12 @@ use Zabbix::Host;
 use Zabbix::HostGroup;
 use Zabbix::Log;
 use Text::CSV;
+use Text::Iconv;
 
 #_____VARIABLES_____
 my $force_update 	= $ARGV[0];
-my $file 			= $ARGV[1];
+my $fileInput 		= $ARGV[1];
+
 
 #_____FUNCTIONS_____
 
@@ -48,7 +50,7 @@ if ( $zabbixAuth->login() ) {
 
 	# Lecture du Fichier CSV ligne par ligne
 	# Chargement du fichier
-	$zabbixLog->log_INFO("Chargement du fichier $file");
+	$zabbixLog->log_INFO("Chargement du fichier $fileInput");
 
 	my $csv = Text::CSV->new({
 		binary   	=> 1,
@@ -57,7 +59,11 @@ if ( $zabbixAuth->login() ) {
 		#eol			=> "\r\n",
 	});
 
-	open (my $data ,'<:encoding(utf-8)',$file) or die "Impossible d'ouvrir le fichier '$file' !\n";
+	# Conversion du fichier
+	my $encodage = Text::Iconv->new("cp1252","utf-8");
+	my $file = $encodage->convert($fileInput);
+	
+	open (my $data ,'<',$file) or die "Impossible d'ouvrir le fichier '$file' !\n";
 	
 	# Ignore header
 	$csv->getline($data);
